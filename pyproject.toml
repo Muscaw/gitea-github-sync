@@ -5,12 +5,12 @@ profile = "black"
 line-length = 100
 
 [tool.poetry]
-name = "gitea-github-auto-mirror"
+name = "gitea-github-sync"
 version = "0.1.0"
 description = ""
 authors = ["= <Muscaw@users.noreply.github.com>"]
 readme = "README.md"
-packages = [{include = "gitea_github_auto_mirror"}]
+packages = [{include = "gitea_github_sync"}]
 
 [tool.poetry.dependencies]
 python = "^3.10"
