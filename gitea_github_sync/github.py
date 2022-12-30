@@ -33,8 +33,7 @@ class Repository:
         return self.full_repo_name.split("/")[1]
 
 
-def get_github() -> Github:
-    conf = config.load_config()
+def get_github(conf: config.Config = config.load_config()) -> Github:
     return Github(login_or_token=conf.github_token)
 
 
