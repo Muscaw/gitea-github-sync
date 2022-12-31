@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from enum import Flag, auto
-from typing import List
+from typing import List, Optional
 
 from github import Github
 
@@ -36,7 +36,9 @@ class Repository:
         return self.full_repo_name.split("/")[1]
 
 
-def get_github(conf: config.Config = config.load_config()) -> Github:
+def get_github(conf: Optional[config.Config] = None) -> Github:
+    if conf is None:
+        conf = config.load_config()
     return Github(login_or_token=conf.github_token)
 
 

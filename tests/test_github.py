@@ -71,13 +71,17 @@ def test_github(mock_github: MagicMock, conf_fixture: Config) -> None:
     mock_github.assert_called_once_with(conf_fixture.github_token)
 
 
+@patch("gitea_github_sync.github.config.load_config", autospec=True)
 @patch("gitea_github_sync.github.Github", autospec=True)
-def test_github_default_value(mock_github: MagicMock, conf_fixture: Config) -> None:
-    get_github.__defaults__ = (conf_fixture,)
+def test_github_default_value(
+    mock_github: MagicMock, mock_load_config: MagicMock, conf_fixture: Config
+) -> None:
+    mock_load_config.return_value = conf_fixture
     gh = get_github()
 
     assert gh == mock_github.return_value
     mock_github.assert_called_once_with(conf_fixture.github_token)
+    mock_load_config.assert_called_once()
 
 
 @dataclass(frozen=True)
