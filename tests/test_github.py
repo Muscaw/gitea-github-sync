@@ -1,10 +1,17 @@
 from dataclasses import dataclass
 from typing import List
-from unittest.mock import patch, MagicMock
+from unittest.mock import MagicMock, patch
+
 import pytest
-from gitea_github_sync.github import Visibility, Repository, get_github, list_all_repositories
-from gitea_github_sync.config import Config
 from github import Github
+
+from gitea_github_sync.config import Config
+from gitea_github_sync.github import (
+    Repository,
+    Visibility,
+    get_github,
+    list_all_repositories,
+)
 
 
 @pytest.fixture

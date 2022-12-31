@@ -1,9 +1,12 @@
 from __future__ import annotations
-from typing import List
-from github import Github
-from . import config
+
 from dataclasses import dataclass
 from enum import Flag, auto
+from typing import List
+
+from github import Github
+
+from . import config
 
 
 class Visibility(Flag):

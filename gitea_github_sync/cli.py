@@ -1,6 +1,7 @@
 import click
-from . import github
 from rich import print
+
+from . import github
 
 
 @click.group()
