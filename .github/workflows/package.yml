@@ -1,6 +1,10 @@
-name: Test, lint and package
+name: Test and lint
 
-on: [pull_request]
+on:
+  pull_request: {}
+  push:
+    branches:
+      - main
 
 jobs:
   build:
