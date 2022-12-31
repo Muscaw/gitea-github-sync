@@ -27,7 +27,9 @@ jobs:
       - name: Install dependencies
         run: poetry install --with dev
       - name: Check linters for failure
-        run: poetry run tox -echeck
+        run: |
+          poetry run pip install tox-gh-actions
+          poetry run tox -echeck
       - name: Upload code coverage
         uses: codecov/codecov-action@v2
         with:
