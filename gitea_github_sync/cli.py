@@ -1,7 +1,7 @@
 import click
 from rich import print
 
-from . import github
+from . import github, repository
 
 
 @click.group()
@@ -21,10 +21,10 @@ def list_all_repositories(stats: bool) -> None:
         print()
         print("[b]Repository stats[/]")
         number_public_repos = sum(
-            [1 if repo.visibility == github.Visibility.PUBLIC else 0 for repo in repos]
+            1 if repo.visibility == repository.Visibility.PUBLIC else 0 for repo in repos
         )
         number_private_repos = sum(
-            [1 if repo.visibility == github.Visibility.PRIVATE else 0 for repo in repos]
+            1 if repo.visibility == repository.Visibility.PRIVATE else 0 for repo in repos
         )
         number_unknown_repos = len(repos) - number_public_repos - number_private_repos
         print(f"Number of public repos identified: [b red]{number_public_repos}[/]")
