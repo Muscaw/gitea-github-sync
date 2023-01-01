@@ -6,7 +6,7 @@ import pytest
 from click.testing import CliRunner
 
 from gitea_github_sync.cli import cli
-from gitea_github_sync.github import Repository, Visibility
+from gitea_github_sync.repository import Repository, Visibility
 
 
 @pytest.fixture
