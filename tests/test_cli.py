@@ -1,11 +1,12 @@
 import textwrap
+from io import StringIO
 from typing import List
 from unittest.mock import MagicMock, patch
 
 import pytest
 from click.testing import CliRunner
 
-from gitea_github_sync.cli import cli
+from gitea_github_sync.cli import cli, print_repositories
 from gitea_github_sync.repository import Repository, Visibility
 
 
@@ -18,11 +19,15 @@ def repositories_fixture() -> List[Repository]:
     ]
 
 
+@pytest.mark.parametrize("expected_stat", [True, False])
+@patch("gitea_github_sync.cli.print_repositories", autospec=True)
 @patch("gitea_github_sync.cli.github.get_github", autospec=True)
 @patch("gitea_github_sync.cli.github.list_all_repositories", autospec=True)
-def test_list_all_repositories(
+def test_list_all_github_repositories_with_stats(
     mock_list_all_repositories: MagicMock,
     mock_get_github: MagicMock,
+    mock_print_repositories: MagicMock,
+    expected_stat: bool,
     repositories_fixture: List[Repository],
 ) -> None:
     mock_github = MagicMock()
@@ -30,26 +35,31 @@ def test_list_all_repositories(
     mock_list_all_repositories.return_value = repositories_fixture
 
     runner = CliRunner()
-    result = runner.invoke(cli, ["list-all-repositories"])
+    command = (
+        ["list-all-github-repositories", "--stats"]
+        if expected_stat
+        else ["list-all-github-repositories"]
+    )
+    result = runner.invoke(cli, command)
 
-    assert result.output == "some-team/a-repo\nsome-team/b-repo\nsome-team/c-repo\n"
     assert result.exit_code == 0
+    mock_print_repositories.assert_called_once_with(repositories_fixture, expected_stat)
 
 
-@patch("gitea_github_sync.cli.github.get_github", autospec=True)
-@patch("gitea_github_sync.cli.github.list_all_repositories", autospec=True)
-def test_list_all_repositories_with_stats(
-    mock_list_all_repositories: MagicMock,
-    mock_get_github: MagicMock,
+@patch("sys.stdout", new_callable=StringIO)
+def test_print_repositories_without_stats(
+    stdout: StringIO,
     repositories_fixture: List[Repository],
 ) -> None:
-    mock_github = MagicMock()
-    mock_get_github.return_value = mock_github
-    mock_list_all_repositories.return_value = repositories_fixture
 
-    runner = CliRunner()
-    result = runner.invoke(cli, ["list-all-repositories", "--stats"])
+    print_repositories(repositories_fixture, False)
+    assert stdout.getvalue() == "some-team/a-repo\nsome-team/b-repo\nsome-team/c-repo\n"
 
+
+@patch("sys.stdout", new_callable=StringIO)
+def test_print_repositories(stdout: StringIO, repositories_fixture: List[Repository]) -> None:
+
+    print_repositories(repositories_fixture, True)
     expected_result = textwrap.dedent(
         """\
     some-team/a-repo
@@ -64,5 +74,4 @@ def test_list_all_repositories_with_stats(
     """
     )
 
-    assert result.output == expected_result
-    assert result.exit_code == 0
+    assert stdout.getvalue() == expected_result

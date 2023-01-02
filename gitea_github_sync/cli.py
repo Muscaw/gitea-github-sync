@@ -1,3 +1,5 @@
+from typing import List
+
 import click
 from rich import print
 
@@ -9,15 +11,11 @@ def cli() -> None:
     pass
 
 
-@click.option("--stats", is_flag=True)
-@cli.command()
-def list_all_repositories(stats: bool) -> None:
-    gh = github.get_github()
-    repos = github.list_all_repositories(gh)
+def print_repositories(repos: List[repository.Repository], display_stats: bool) -> None:
     for repo in repos:
         print(f"[b]{repo.get_org_name()}[/]/{repo.get_repo_name()}")
 
-    if stats:
+    if display_stats:
         print()
         print("[b]Repository stats[/]")
         number_public_repos = sum(
@@ -31,3 +29,11 @@ def list_all_repositories(stats: bool) -> None:
         print(f"Number of private repos identified: [b red]{number_private_repos}[/]")
         print(f"Number of unknown repos identified: [b red]{number_unknown_repos}[/]")
         print(f"Total number of repos identified: [b red]{len(repos)}[/]")
+
+
+@click.option("--stats", is_flag=True)
+@cli.command()
+def list_all_github_repositories(stats: bool) -> None:
+    gh = github.get_github()
+    repos = github.list_all_repositories(gh)
+    print_repositories(repos, stats)
