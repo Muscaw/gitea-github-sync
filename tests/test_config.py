@@ -8,10 +8,15 @@ from gitea_github_sync.config import Config, config_file_location, load_config
 
 VALID_CONFIG_FILE = """
 github_token: some-github-token
+gitea_api_url: https://some-gitea-url.com
 gitea_token: some-gitea-token
 """
 
-VALID_CONFIG = Config(github_token="some-github-token", gitea_token="some-gitea-token")
+VALID_CONFIG = Config(
+    github_token="some-github-token",
+    gitea_api_url="https://some-gitea-url.com",
+    gitea_token="some-gitea-token",
+)
 
 DEFAULT_CONFIG_FILE_PATH = config_file_location()
 

@@ -23,7 +23,7 @@ def repositories_fixture() -> List[Repository]:
 @patch("gitea_github_sync.cli.print_repositories", autospec=True)
 @patch("gitea_github_sync.cli.github.get_github", autospec=True)
 @patch("gitea_github_sync.cli.github.list_all_repositories", autospec=True)
-def test_list_all_github_repositories_with_stats(
+def test_list_all_github_repositories(
     mock_list_all_repositories: MagicMock,
     mock_get_github: MagicMock,
     mock_print_repositories: MagicMock,
@@ -39,6 +39,31 @@ def test_list_all_github_repositories_with_stats(
         ["list-all-github-repositories", "--stats"]
         if expected_stat
         else ["list-all-github-repositories"]
+    )
+    result = runner.invoke(cli, command)
+
+    assert result.exit_code == 0
+    mock_print_repositories.assert_called_once_with(repositories_fixture, expected_stat)
+
+
+@pytest.mark.parametrize("expected_stat", [True, False])
+@patch("gitea_github_sync.cli.print_repositories", autospec=True)
+@patch("gitea_github_sync.cli.gitea.get_gitea", autospec=True)
+def test_list_all_gitea_repositories(
+    mock_get_gitea: MagicMock,
+    mock_print_repositories: MagicMock,
+    expected_stat: bool,
+    repositories_fixture: List[Repository],
+) -> None:
+    mock_gitea = MagicMock()
+    mock_get_gitea.return_value = mock_gitea
+    mock_gitea.get_repos.return_value = repositories_fixture
+
+    runner = CliRunner()
+    command = (
+        ["list-all-gitea-repositories", "--stats"]
+        if expected_stat
+        else ["list-all-gitea-repositories"]
     )
     result = runner.invoke(cli, command)
 
