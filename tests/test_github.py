@@ -8,6 +8,7 @@ from github import Github
 from gitea_github_sync.config import Config
 from gitea_github_sync.github import get_github, list_all_repositories
 from gitea_github_sync.repository import Repository, Visibility
+
 from .test_config import VALID_CONFIG
 
 

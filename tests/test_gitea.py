@@ -1,6 +1,8 @@
 from typing import Any, Dict
+
 import responses
 from responses import matchers
+
 from gitea_github_sync.gitea import Gitea
 from gitea_github_sync.repository import Repository, Visibility
 
