@@ -1,7 +1,10 @@
+from __future__ import annotations
 from dataclasses import dataclass
 from typing import Any, Dict, List, Optional
 
 import requests
+
+from gitea_github_sync import config
 
 from .repository import Repository, Visibility
 
@@ -37,3 +40,9 @@ class Gitea:
             )
             for repo in repos
         ]
+
+
+def get_gitea(conf: Optional[config.Config] = None) -> Gitea:
+    if conf is None:
+        conf = config.load_config()
+    return Gitea(api_url=conf.gitea_api_url, api_token=conf.gitea_token)

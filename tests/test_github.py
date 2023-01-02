@@ -8,11 +8,12 @@ from github import Github
 from gitea_github_sync.config import Config
 from gitea_github_sync.github import get_github, list_all_repositories
 from gitea_github_sync.repository import Repository, Visibility
+from .test_config import VALID_CONFIG
 
 
 @pytest.fixture
 def conf_fixture() -> Config:
-    return Config(github_token="some-github-token", gitea_token="some-gitea-token")
+    return VALID_CONFIG
 
 
 @pytest.mark.parametrize(

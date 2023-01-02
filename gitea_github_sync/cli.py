@@ -3,7 +3,7 @@ from typing import List
 import click
 from rich import print
 
-from . import github, repository
+from . import github, repository, gitea
 
 
 @click.group()
@@ -36,4 +36,12 @@ def print_repositories(repos: List[repository.Repository], display_stats: bool) 
 def list_all_github_repositories(stats: bool) -> None:
     gh = github.get_github()
     repos = github.list_all_repositories(gh)
+    print_repositories(repos, stats)
+
+
+@click.option("--stats", is_flag=True)
+@cli.command()
+def list_all_gitea_repositories(stats: bool) -> None:
+    gt = gitea.get_gitea()
+    repos = gt.get_repos()
     print_repositories(repos, stats)

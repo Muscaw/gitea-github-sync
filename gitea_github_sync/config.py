@@ -8,6 +8,7 @@ from pydantic import BaseModel
 
 class Config(BaseModel):
     github_token: str
+    gitea_api_url: str
     gitea_token: str
 
 
