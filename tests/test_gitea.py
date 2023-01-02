@@ -1,9 +1,10 @@
 from unittest.mock import MagicMock, patch
+
 import pytest
 import responses
 from responses import matchers
-from gitea_github_sync.config import Config
 
+from gitea_github_sync.config import Config
 from gitea_github_sync.gitea import Gitea, get_gitea
 from gitea_github_sync.repository import Repository, Visibility
 
