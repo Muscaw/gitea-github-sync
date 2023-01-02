@@ -14,7 +14,8 @@ def gitea_fixture(custom_params: Dict[str, Any] = dict()) -> Gitea:
     params = {
         "api_url": GITEA_BASE_API_URL,
         "api_token": GITEA_TOKEN,
-    } | custom_params
+    }
+    params.update(custom_params)
     return Gitea(**params)
 
 
