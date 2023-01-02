@@ -1,27 +1,30 @@
-from typing import Any, Dict
-
+from unittest.mock import MagicMock, patch
+import pytest
 import responses
 from responses import matchers
+from gitea_github_sync.config import Config
 
-from gitea_github_sync.gitea import Gitea
+from gitea_github_sync.gitea import Gitea, get_gitea
 from gitea_github_sync.repository import Repository, Visibility
 
 GITEA_BASE_API_URL = "https://gitea.yourinstance.com/api/v1"
 GITEA_TOKEN = "your-gitea-token"
 
 
-def gitea_fixture(custom_params: Dict[str, Any] = dict()) -> Gitea:
-    params = {
-        "api_url": GITEA_BASE_API_URL,
-        "api_token": GITEA_TOKEN,
-    }
-    params.update(custom_params)
-    return Gitea(**params)
+@pytest.fixture
+def conf_fixture() -> Config:
+    return Config(
+        github_token="some-token", gitea_api_url=GITEA_BASE_API_URL, gitea_token=GITEA_TOKEN
+    )
+
+
+@pytest.fixture
+def gitea_fixture(conf_fixture: Config) -> Gitea:
+    return Gitea(api_url=conf_fixture.gitea_api_url, api_token=conf_fixture.gitea_token)
 
 
 @responses.activate
-def test_get_repos() -> None:
-    gitea = gitea_fixture()
+def test_get_repos(gitea_fixture: Gitea) -> None:
 
     json = [
         {"full_name": "some-team/a-repo", "private": True},
@@ -38,13 +41,12 @@ def test_get_repos() -> None:
         json=json,
     )
 
-    result = gitea.get_repos()
+    result = gitea_fixture.get_repos()
     assert expected_repos == result
 
 
 @responses.activate
-def test_get_repos_multiple_pages() -> None:
-    gitea = gitea_fixture()
+def test_get_repos_multiple_pages(gitea_fixture: Gitea) -> None:
 
     json_1 = [
         {"full_name": "some-team/a-repo", "private": True},
@@ -103,5 +105,22 @@ def test_get_repos_multiple_pages() -> None:
         },
     )
 
-    result = gitea.get_repos()
+    result = gitea_fixture.get_repos()
     assert expected_repos == result
+
+
+def test_gitea(gitea_fixture: Gitea, conf_fixture: Config) -> None:
+    gt = get_gitea(conf_fixture)
+
+    assert gt == gitea_fixture
+
+
+@patch("gitea_github_sync.gitea.config.load_config", autospec=True)
+def test_gitea_default_value(
+    mock_load_config: MagicMock, gitea_fixture: Gitea, conf_fixture: Config
+) -> None:
+    mock_load_config.return_value = conf_fixture
+    gt = get_gitea()
+
+    assert gt == gitea_fixture
+    mock_load_config.assert_called_once()
