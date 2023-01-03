@@ -1,5 +1,7 @@
 from typing import List
+
 import pytest
+
 from gitea_github_sync.migration import list_missing_github_repos
 from gitea_github_sync.repository import Repository, Visibility
 
@@ -23,19 +25,19 @@ def team_b_repo(repo_name: str) -> Repository:
             [team_a_repo("a-repo"), team_a_repo("b-repo")],
             [team_b_repo("a-repo"), team_b_repo("b-repo")],
             [],
-            id="equal"
+            id="equal",
         ),
         pytest.param(
             [team_a_repo("a-repo"), team_a_repo("b-repo")],
             [team_b_repo("a-repo")],
             [team_a_repo("b-repo")],
-            id="missing-repo-on-gitea"
+            id="missing-repo-on-gitea",
         ),
         pytest.param(
             [team_a_repo("a-repo"), team_a_repo("b-repo")],
             [team_b_repo("a-repo"), team_b_repo("b-repo"), team_b_repo("c-repo")],
             [],
-            id="too-many-repos-on-gitea"
+            id="too-many-repos-on-gitea",
         ),
     ],
 )
