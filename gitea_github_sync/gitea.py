@@ -41,6 +41,14 @@ class Gitea:
             )
             for repo in repos
         ]
+    
+    def migrate_repo(self, repo: Repository, github_token: str) -> None:
+        request_data = {
+            "auth_token": github_token,
+            "clone_addr": "https://github.com/{"
+        }
+        requests.post(f"{self.api_url}/repos/migrate", headers=self._get_authorization_header())
+        
 
 
 def get_gitea(conf: Optional[config.Config] = None) -> Gitea:
