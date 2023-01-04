@@ -117,9 +117,9 @@ def test_migrate_repo_no_match(
     command = ["migrate-repo", repo_name]
     result = runner.invoke(cli, command)
 
+    assert result.exit_code != 0
     assert "Aborted!" in result.stdout
     assert f"Repository {repo_name} does not exist on Github" in result.stdout
-    assert result.exit_code != 0
     mock_list_all_repositories.assert_called_once_with(mock_get_github.return_value)
     mock_get_gitea.return_value.migrate_repo.assert_not_called()
 
