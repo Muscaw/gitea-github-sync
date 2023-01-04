@@ -181,3 +181,8 @@ def test_gitea_default_value(
 
     assert gt == gitea_fixture
     mock_load_config.assert_called_once()
+
+
+def test_gitea_migration_error() -> None:
+    error = GiteaMigrationError("Muscaw/gitea-github-sync")
+    assert str(error) == "Could not migrate Muscaw/gitea-github-sync"
