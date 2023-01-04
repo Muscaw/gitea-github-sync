@@ -101,6 +101,7 @@ def test_migrate_repo(
     )
 
 
+@patch("gitea_github_sync.cli.config.load_config", autospec=True)
 @patch("gitea_github_sync.cli.github.list_all_repositories", autospec=True)
 @patch("gitea_github_sync.cli.github.get_github", autospec=True)
 @patch("gitea_github_sync.cli.gitea.get_gitea", autospec=True)
@@ -108,6 +109,7 @@ def test_migrate_repo_no_match(
     mock_get_gitea: MagicMock,
     mock_get_github: MagicMock,
     mock_list_all_repositories: MagicMock,
+    mock_load_config: MagicMock,
     repositories_fixture: List[Repository],
 ) -> None:
     mock_list_all_repositories.return_value = repositories_fixture
@@ -118,13 +120,11 @@ def test_migrate_repo_no_match(
     result = runner.invoke(cli, command)
 
     assert result.exit_code != 0
-    import rich
-
-    rich.print(result.__dict__)
     assert "Aborted!" in result.stdout
     assert f"Repository {repo_name} does not exist on Github" in result.stdout
     mock_list_all_repositories.assert_called_once_with(mock_get_github.return_value)
     mock_get_gitea.return_value.migrate_repo.assert_not_called()
+    mock_load_config.assert_called_once()
 
 
 @patch("sys.stdout", new_callable=StringIO)
