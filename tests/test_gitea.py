@@ -164,7 +164,6 @@ def test_gitea_migrate_repo_failure_to_migrate(gitea_fixture: Gitea, is_private:
 
     with pytest.raises(GiteaMigrationError):
         gitea_fixture.migrate_repo(repo, gh_token)
-    pass
 
 
 def test_gitea(gitea_fixture: Gitea, conf_fixture: Config) -> None:
