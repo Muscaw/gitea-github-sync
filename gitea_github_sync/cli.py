@@ -3,7 +3,7 @@ from typing import List
 import click
 from rich import print
 
-from . import gitea, github, repository
+from . import config, gitea, github, repository
 
 
 @click.group()
@@ -45,3 +45,19 @@ def list_all_gitea_repositories(stats: bool) -> None:
     gt = gitea.get_gitea()
     repos = gt.get_repos()
     print_repositories(repos, stats)
+
+
+@cli.command()
+@click.argument("full_repo_name")
+def migrate_repo(full_repo_name: str) -> None:
+    conf = config.load_config()
+    gt = gitea.get_gitea()
+    gh = github.get_github()
+    github_repos = github.list_all_repositories(gh)
+    try:
+        repo = next((repo for repo in github_repos if repo.full_repo_name == full_repo_name))
+    except StopIteration:
+        print(f"[b red]Repository {full_repo_name} does not exist on Github[/]")
+        raise click.Abort()
+
+    gt.migrate_repo(repo=repo, github_token=conf.github_token)

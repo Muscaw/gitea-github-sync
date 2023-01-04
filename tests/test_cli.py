@@ -1,7 +1,7 @@
 import textwrap
 from io import StringIO
 from typing import List
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock, PropertyMock, patch
 
 import pytest
 from click.testing import CliRunner
@@ -69,6 +69,62 @@ def test_list_all_gitea_repositories(
 
     assert result.exit_code == 0
     mock_print_repositories.assert_called_once_with(repositories_fixture, expected_stat)
+
+
+@patch("gitea_github_sync.cli.config.load_config", autospec=True)
+@patch("gitea_github_sync.cli.github.list_all_repositories", autospec=True)
+@patch("gitea_github_sync.cli.github.get_github", autospec=True)
+@patch("gitea_github_sync.cli.gitea.get_gitea", autospec=True)
+def test_migrate_repo(
+    mock_get_gitea: MagicMock,
+    mock_get_github: MagicMock,
+    mock_list_all_repositories: MagicMock,
+    mock_load_config: MagicMock,
+    repositories_fixture: List[Repository],
+) -> None:
+    expected_repo = Repository("Muscaw/gitea-github-sync", Visibility.PRIVATE)
+    expected_github_token = "some-github-token"
+
+    type(mock_load_config.return_value).github_token = PropertyMock(
+        return_value=expected_github_token
+    )
+    mock_list_all_repositories.return_value = repositories_fixture + [expected_repo]
+
+    runner = CliRunner()
+    command = ["migrate-repo", "Muscaw/gitea-github-sync"]
+    result = runner.invoke(cli, command)
+
+    assert result.exit_code == 0
+    mock_list_all_repositories.assert_called_once_with(mock_get_github.return_value)
+    mock_get_gitea.return_value.migrate_repo.assert_called_once_with(
+        repo=expected_repo, github_token=expected_github_token
+    )
+
+
+@patch("gitea_github_sync.cli.config.load_config", autospec=True)
+@patch("gitea_github_sync.cli.github.list_all_repositories", autospec=True)
+@patch("gitea_github_sync.cli.github.get_github", autospec=True)
+@patch("gitea_github_sync.cli.gitea.get_gitea", autospec=True)
+def test_migrate_repo_no_match(
+    mock_get_gitea: MagicMock,
+    mock_get_github: MagicMock,
+    mock_list_all_repositories: MagicMock,
+    mock_load_config: MagicMock,
+    repositories_fixture: List[Repository],
+) -> None:
+    mock_list_all_repositories.return_value = repositories_fixture
+    repo_name = "Muscaw/gitea-github-sync"
+
+    runner = CliRunner()
+    command = ["migrate-repo", repo_name]
+    result = runner.invoke(cli, command)
+
+    assert result.exit_code != 0
+    assert "Aborted!" in result.stdout
+    assert f"Repository {repo_name} does not exist on Github" in result.stdout
+    mock_list_all_repositories.assert_called_once_with(mock_get_github.return_value)
+    mock_get_gitea.return_value.migrate_repo.assert_not_called()
+    mock_load_config.assert_called_once()
 
 
 @patch("sys.stdout", new_callable=StringIO)

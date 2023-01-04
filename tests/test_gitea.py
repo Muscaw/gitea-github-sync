@@ -5,7 +5,7 @@ import responses
 from responses import matchers
 
 from gitea_github_sync.config import Config
-from gitea_github_sync.gitea import Gitea, get_gitea
+from gitea_github_sync.gitea import Gitea, GiteaMigrationError, get_gitea
 from gitea_github_sync.repository import Repository, Visibility
 
 GITEA_BASE_API_URL = "https://gitea.yourinstance.com/api/v1"
@@ -25,7 +25,7 @@ def gitea_fixture(conf_fixture: Config) -> Gitea:
 
 
 @responses.activate
-def test_get_repos(gitea_fixture: Gitea) -> None:
+def test_gitea_get_repos(gitea_fixture: Gitea) -> None:
 
     json = [
         {"full_name": "some-team/a-repo", "private": True},
@@ -47,7 +47,7 @@ def test_get_repos(gitea_fixture: Gitea) -> None:
 
 
 @responses.activate
-def test_get_repos_multiple_pages(gitea_fixture: Gitea) -> None:
+def test_gitea_get_repos_multiple_pages(gitea_fixture: Gitea) -> None:
 
     json_1 = [
         {"full_name": "some-team/a-repo", "private": True},
@@ -110,6 +110,62 @@ def test_get_repos_multiple_pages(gitea_fixture: Gitea) -> None:
     assert expected_repos == result
 
 
+@responses.activate
+@pytest.mark.parametrize("is_private", [True, False])
+def test_gitea_migrate_repo(gitea_fixture: Gitea, is_private: bool) -> None:
+    gh_token = "some-github-token"
+    expected_data = {
+        "auth_token": gh_token,
+        "clone_addr": "https://github.com/Muscaw/gitea-github-sync",
+        "repo_name": "gitea-github-sync",
+        "service": "github",
+        "mirror": True,
+        "private": is_private,
+    }
+    repo = Repository(
+        full_repo_name="Muscaw/gitea-github-sync",
+        visibility=Visibility.PRIVATE if is_private else Visibility.PUBLIC,
+    )
+    responses.post(
+        f"{GITEA_BASE_API_URL}/repos/migrate",
+        match=[
+            matchers.header_matcher({"Authorization": f"token {GITEA_TOKEN}"}),
+            matchers.json_params_matcher(expected_data),
+        ],
+    )
+
+    gitea_fixture.migrate_repo(repo, gh_token)
+
+
+@responses.activate
+@pytest.mark.parametrize("is_private", [True, False])
+def test_gitea_migrate_repo_failure_to_migrate(gitea_fixture: Gitea, is_private: bool) -> None:
+    gh_token = "some-github-token"
+    expected_data = {
+        "auth_token": gh_token,
+        "clone_addr": "https://github.com/Muscaw/gitea-github-sync",
+        "repo_name": "gitea-github-sync",
+        "service": "github",
+        "mirror": True,
+        "private": is_private,
+    }
+    repo = Repository(
+        full_repo_name="Muscaw/gitea-github-sync",
+        visibility=Visibility.PRIVATE if is_private else Visibility.PUBLIC,
+    )
+    responses.post(
+        f"{GITEA_BASE_API_URL}/repos/migrate",
+        match=[
+            matchers.header_matcher({"Authorization": f"token {GITEA_TOKEN}"}),
+            matchers.json_params_matcher(expected_data),
+        ],
+        status=409,
+    )
+
+    with pytest.raises(GiteaMigrationError):
+        gitea_fixture.migrate_repo(repo, gh_token)
+
+
 def test_gitea(gitea_fixture: Gitea, conf_fixture: Config) -> None:
     gt = get_gitea(conf_fixture)
 
@@ -125,3 +181,8 @@ def test_gitea_default_value(
 
     assert gt == gitea_fixture
     mock_load_config.assert_called_once()
+
+
+def test_gitea_migration_error() -> None:
+    error = GiteaMigrationError("Muscaw/gitea-github-sync")
+    assert str(error) == "Could not migrate Muscaw/gitea-github-sync"
