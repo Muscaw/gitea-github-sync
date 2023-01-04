@@ -3,7 +3,7 @@ from typing import List
 import click
 from rich import print
 
-from . import gitea, github, repository, config
+from . import config, gitea, github, repository
 
 
 @click.group()
