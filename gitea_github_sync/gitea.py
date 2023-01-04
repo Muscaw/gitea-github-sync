@@ -56,6 +56,7 @@ class Gitea:
             "clone_addr": f"https://github.com/{repo.full_repo_name}",
             "repo_name": repo.get_repo_name(),
             "service": "github",
+            "mirror": True,
             "private": repo.visibility == Visibility.PRIVATE,
         }
         res = requests.post(

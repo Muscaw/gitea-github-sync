@@ -119,6 +119,7 @@ def test_gitea_migrate_repo(gitea_fixture: Gitea, is_private: bool) -> None:
         "clone_addr": "https://github.com/Muscaw/gitea-github-sync",
         "repo_name": "gitea-github-sync",
         "service": "github",
+        "mirror": True,
         "private": is_private,
     }
     repo = Repository(
@@ -145,6 +146,7 @@ def test_gitea_migrate_repo_failure_to_migrate(gitea_fixture: Gitea, is_private:
         "clone_addr": "https://github.com/Muscaw/gitea-github-sync",
         "repo_name": "gitea-github-sync",
         "service": "github",
+        "mirror": True,
         "private": is_private,
     }
     repo = Repository(
