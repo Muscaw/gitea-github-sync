@@ -24,6 +24,8 @@ jobs:
       - name: Install poetry
         uses: snok/install-poetry@v1
       - name: Publish to Pypi
+        env:
+          POETRY_PYPI_TOKEN_PYPI: ${{ secrets.POETRY_PYPI_TOKEN_PYPI }}
         run: |
           poetry --build publish
       
