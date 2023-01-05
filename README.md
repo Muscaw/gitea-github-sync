@@ -50,6 +50,19 @@ Both work with gitea-github-sync, but given that Gitea does not allow the modifi
 
 `gitea-github-sync sync` Migrates all repos not present in Gitea from Github
 
+## Automate gitea-github-sync execution
+
+There are multiple ways to automate the execution of gitea-github-sync. One of them is using cron:
+
+First, execute `crontab -e` to open the cron configuration file in edit mode.
+
+Then add the following line:
+```
+0 12 * * * gitea-github-sync sync
+```
+
+This will execute the sync operation every day at twelve.
+
 ## Limitations
 
 When using the migration feature of Gitea, a Github token must be passed for Gitea to continuously pull the new changes from Github.
