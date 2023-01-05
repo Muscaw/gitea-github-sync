@@ -28,7 +28,7 @@ jobs:
           push: true
           tags: 
             - ${{ secrets.DOCKERHUB_USERNAME }}/gitea-github-sync:latest
-            - ${{ secrets.DOCKERHUB_USERNAME }}/gitea-github-sync:${{ env.GITHUB_REF_NAME }}
+            - ${{ secrets.DOCKERHUB_USERNAME }}/gitea-github-sync:${{ github.ref_name }}
   publish-to-pypi:
     needs: call-build
     runs-on: ubuntu-latest

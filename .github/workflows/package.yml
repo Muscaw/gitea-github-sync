@@ -37,7 +37,7 @@ jobs:
           context: .
           file: ./Dockerfile
           push: false
-          tags: ${{ secrets.DOCKERHUB_USERNAME}}/gitea-github-sync:${{ env.GITHUB_REF_NAME }}
+          tags: ${{ secrets.DOCKERHUB_USERNAME}}/gitea-github-sync:${{ github.ref_name }}
       - name: Upload code coverage
         uses: codecov/codecov-action@v2
         with:
