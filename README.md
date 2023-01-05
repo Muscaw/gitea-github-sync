@@ -45,7 +45,7 @@ Both work with gitea-github-sync, but given that Gitea does not allow the modifi
 `gitea-github-sync list-all-github-repositories` Lists all available Github repositories in your account
 
 `gitea-github-sync migrate-repo FULL_REPO_NAME` Migrates one repo from Github to Gitea
-`
+
 `gitea-github-sync sync` Migrates all repos not present in Gitea from Github
 
 ## Limitations
