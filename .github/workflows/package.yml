@@ -31,6 +31,13 @@ jobs:
         run: |
           poetry run pip install tox-gh-actions
           poetry run tox -elint
+      - name: Build docker image
+        uses: docker/build-push-action@v3
+        with:
+          context: .
+          file: ./Dockerfile
+          push: false
+          tags: ${{ secrets.DOCKERHUB_USERNAME}}/gitea-github-sync:${{ env.GITHUB_REF_NAME }}
       - name: Upload code coverage
         uses: codecov/codecov-action@v2
         with:
