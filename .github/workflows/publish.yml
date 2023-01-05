@@ -25,5 +25,5 @@ jobs:
         uses: snok/install-poetry@v1
       - name: Publish to Pypi
         run: |
-          poetry publish
+          poetry --build publish
       
