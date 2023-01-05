@@ -9,6 +9,7 @@ jobs:
   call-build:
     uses: ./.github/workflows/package.yml
   publish-to-pypi:
+    needs: call-build
     runs-on: ubuntu-latest
     defaults:
       run:
