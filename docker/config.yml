@@ -1,0 +1,3 @@
+gitea_api_url: ${GITEA_API_URL}
+gitea_token: ${GITEA_TOKEN}
+github_token: ${GITHUB_TOKEN}

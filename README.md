@@ -8,6 +8,8 @@ gitea-github-sync provides a simple CLI to sync Github repositories to your Gite
 pip install gitea-github-sync
 ```
 
+If you are interested in using a pre-packaged docker image, please look at the [Docker Readme](docs/docker/README.md)
+
 ## Setup
 Create a file in `$HOME/.config/gitea-github-sync/config.yml` with the following template and fill up the missing values:
 
