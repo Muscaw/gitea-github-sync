@@ -1,4 +1,4 @@
-name: Test and lint
+name: Publish to Pypi
 
 on:
   push:
