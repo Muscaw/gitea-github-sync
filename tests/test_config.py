@@ -44,3 +44,8 @@ def test_load_config_bad_file(mock_file_open: MagicMock) -> None:
         load_config()
 
     mock_file_open.assert_called_once_with(DEFAULT_CONFIG_FILE_PATH)
+
+
+def test_config_file_location() -> None:
+    result = config_file_location()
+    assert result == Path.home() / ".config" / "gitea-github-sync" / "config.yml"

@@ -13,7 +13,7 @@ class Config(BaseModel):
 
 
 def config_file_location() -> Path:
-    return Path.home() / ".config" / "gitea-mirror" / "config.yml"
+    return Path.home() / ".config" / "gitea-github-sync" / "config.yml"
 
 
 def load_config(config_location: Path = config_file_location()) -> Config:
