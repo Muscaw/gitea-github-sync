@@ -7,9 +7,26 @@ line-length = 100
 [tool.poetry]
 name = "gitea-github-sync"
 version = "0.1.0"
-description = ""
+homepage = "https://github.com/Muscaw/gitea-github-sync"
+description = "Syncs your gitea instance with your Github account"
 authors = ["Kevin Grandjean <Muscaw@users.noreply.github.com>"]
 readme = "README.md"
+license = "MIT"
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Environment :: Console",
+    "Intended Audience :: Developers",
+    "Intended Audience :: End Users/Desktop",
+    "Intended Audience :: Information Technology",
+    "Intended Audience :: System Administrators",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Typing :: Typed",
+]
 packages = [{include = "gitea_github_sync"}]
 
 [tool.poetry.dependencies]
