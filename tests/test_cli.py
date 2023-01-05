@@ -1,7 +1,7 @@
 import textwrap
 from io import StringIO
 from typing import List
-from unittest.mock import MagicMock, PropertyMock, patch
+from unittest.mock import MagicMock, PropertyMock, call, patch
 
 import pytest
 from click.testing import CliRunner
@@ -125,6 +125,78 @@ def test_migrate_repo_no_match(
     mock_list_all_repositories.assert_called_once_with(mock_get_github.return_value)
     mock_get_gitea.return_value.migrate_repo.assert_not_called()
     mock_load_config.assert_called_once()
+
+
+NO_REPOS: List[Repository] = []
+MULTIPLE_REPOS = [
+    Repository("some-team/a-repo", Visibility.PUBLIC),
+    Repository("some-team/b-repo", Visibility.PRIVATE),
+    Repository("some-team/c-repo", Visibility.UNKNOWN),
+]
+
+
+@pytest.mark.parametrize(
+    "repos_to_sync, expected_output",
+    [
+        (
+            NO_REPOS,
+            textwrap.dedent(
+                """\
+                Starting migration for 0 repos
+                Migrated 0 repos successfully
+            """
+            ),
+        ),
+        (
+            MULTIPLE_REPOS,
+            textwrap.dedent(
+                """\
+                Starting migration for 3 repos
+                Migrating some-team/a-repo
+                Migrating some-team/b-repo
+                Migrating some-team/c-repo
+                Migrated 3 repos successfully
+                """
+            ),
+        ),
+    ],
+)
+@patch("gitea_github_sync.cli.migration.list_missing_github_repos", autospec=True)
+@patch("gitea_github_sync.cli.config.load_config", autospec=True)
+@patch("gitea_github_sync.cli.github.list_all_repositories", autospec=True)
+@patch("gitea_github_sync.cli.github.get_github", autospec=True)
+@patch("gitea_github_sync.cli.gitea.get_gitea", autospec=True)
+def test_sync(
+    mock_get_gitea: MagicMock,
+    mock_get_github: MagicMock,
+    mock_list_all_repositories: MagicMock,
+    mock_load_config: MagicMock,
+    mock_list_missing_github_repos: MagicMock,
+    repos_to_sync: List[Repository],
+    expected_output: str,
+) -> None:
+    expected_github_token = "some-github-token"
+
+    type(mock_load_config.return_value).github_token = PropertyMock(
+        return_value=expected_github_token
+    )
+    mock_list_missing_github_repos.return_value = repos_to_sync
+
+    runner = CliRunner()
+    command = ["sync"]
+    result = runner.invoke(cli, command)
+
+    assert result.exit_code == 0
+    assert result.stdout == expected_output
+    mock_load_config.assert_called_once()
+    mock_list_all_repositories.assert_called_once_with(mock_get_github.return_value)
+    mock_list_missing_github_repos.assert_called_once_with(
+        gh_repos=mock_list_all_repositories.return_value,
+        gitea_repos=mock_get_gitea.return_value.get_repos.return_value,
+    )
+    mock_get_gitea.return_value.migrate_repo.assert_has_calls(
+        [call(repo=repo, github_token=expected_github_token) for repo in repos_to_sync]
+    )
 
 
 @patch("sys.stdout", new_callable=StringIO)
