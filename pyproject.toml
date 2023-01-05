@@ -29,6 +29,9 @@ classifiers = [
 ]
 packages = [{include = "gitea_github_sync"}]
 
+[tool.poetry.scripts]
+gitea-github-sync = "gitea_github_sync.cli:cli"
+
 [tool.poetry.dependencies]
 python = "^3.8.1"
 pygithub = "^1.57"
