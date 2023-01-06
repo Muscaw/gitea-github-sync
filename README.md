@@ -1,3 +1,7 @@
+[![Supported Python Versions](https://img.shields.io/pypi/pyversions/gitea-github-sync/0.1.0)](https://pypi.org/project/gitea-github-sync/) [![PyPI version](https://badge.fury.io/py/gitea-github-sync.svg)](https://badge.fury.io/py/gitea-github-sync)
+
+[![codecov](https://img.shields.io/codecov/c/github/Muscaw/gitea-github-sync?label=codecov&logo=codecov)](https://codecov.io/gh/Muscaw/gitea-github-sync) ![PyPI - Downloads](https://img.shields.io/pypi/dm/gitea-github-sync)
+
 # gitea-github-sync
 
 gitea-github-sync provides a simple CLI to sync Github repositories to your Gitea instance.
