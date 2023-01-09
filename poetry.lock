@@ -497,7 +497,7 @@ tests = ["coverage (>=6.0.0)", "flake8", "mypy", "pytest (>=7.0.0)", "pytest-asy
 
 [[package]]
 name = "rich"
-version = "13.0.0"
+version = "13.0.1"
 description = "Render rich text, tables, progress bars, syntax highlighting, markdown and more to the terminal"
 category = "main"
 optional = false
@@ -1005,8 +1005,8 @@ responses = [
     {file = "responses-0.22.0.tar.gz", hash = "sha256:396acb2a13d25297789a5866b4881cf4e46ffd49cc26c43ab1117f40b973102e"},
 ]
 rich = [
-    {file = "rich-13.0.0-py3-none-any.whl", hash = "sha256:12b1d77ee7edf251b741531323f0d990f5f570a4e7c054d0bfb59fb7981ad977"},
-    {file = "rich-13.0.0.tar.gz", hash = "sha256:3aa9eba7219b8c575c6494446a59f702552efe1aa261e7eeb95548fa586e1950"},
+    {file = "rich-13.0.1-py3-none-any.whl", hash = "sha256:41fe1d05f433b0f4724cda8345219213d2bfa472ef56b2f64f415b5b94d51b04"},
+    {file = "rich-13.0.1.tar.gz", hash = "sha256:25f83363f636995627a99f6e4abc52ed0970ebbd544960cc63cbb43aaac3d6f0"},
 ]
 toml = [
     {file = "toml-0.10.2-py2.py3-none-any.whl", hash = "sha256:806143ae5bfb6a3c6e736a764057db0e6a0e05e338b5630894a5f779cabb4f9b"},
