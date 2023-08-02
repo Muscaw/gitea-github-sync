@@ -40,7 +40,6 @@ class Gitea:
         return output
 
     def get_repos(self) -> List[Repository]:
-
         repos = self._get_all_pages("/user/repos")
         return [
             Repository(
