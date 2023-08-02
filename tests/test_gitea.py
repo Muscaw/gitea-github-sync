@@ -26,7 +26,6 @@ def gitea_fixture(conf_fixture: Config) -> Gitea:
 
 @responses.activate
 def test_gitea_get_repos(gitea_fixture: Gitea) -> None:
-
     json = [
         {"full_name": "some-team/a-repo", "private": True},
         {"full_name": "some-team/b-repo", "private": False},
@@ -48,7 +47,6 @@ def test_gitea_get_repos(gitea_fixture: Gitea) -> None:
 
 @responses.activate
 def test_gitea_get_repos_multiple_pages(gitea_fixture: Gitea) -> None:
-
     json_1 = [
         {"full_name": "some-team/a-repo", "private": True},
         {"full_name": "some-team/b-repo", "private": False},

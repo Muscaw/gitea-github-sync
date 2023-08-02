@@ -204,14 +204,12 @@ def test_print_repositories_without_stats(
     stdout: StringIO,
     repositories_fixture: List[Repository],
 ) -> None:
-
     print_repositories(repositories_fixture, False)
     assert stdout.getvalue() == "some-team/a-repo\nsome-team/b-repo\nsome-team/c-repo\n"
 
 
 @patch("sys.stdout", new_callable=StringIO)
 def test_print_repositories(stdout: StringIO, repositories_fixture: List[Repository]) -> None:
-
     print_repositories(repositories_fixture, True)
     expected_result = textwrap.dedent(
         """\

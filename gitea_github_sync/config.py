@@ -17,7 +17,6 @@ def config_file_location() -> Path:
 
 
 def load_config(config_location: Path = config_file_location()) -> Config:
-
     return Config(
         **YamlLoader(
             path=config_location,
