@@ -76,5 +76,8 @@ def sync() -> None:
     print(f"Starting migration for {len(repos_to_sync)} repos")
     for repo in repos_to_sync:
         print(f"Migrating [b]{repo.full_repo_name}[/]")
-        gt.migrate_repo(repo=repo, github_token=conf.github_token)
+        try:
+            gt.migrate_repo(repo=repo, github_token=conf.github_token)
+        except gitea.GiteaMigrationError as e:
+            print(e)
     print(f"Migrated {len(repos_to_sync)} repos successfully")
