@@ -73,11 +73,13 @@ def sync() -> None:
     repos_to_sync = migration.list_missing_github_repos(
         gh_repos=github_repos, gitea_repos=gitea_repos
     )
-    print(f"Starting migration for {len(repos_to_sync)} repos")
+    len_repos = len(repos_to_sync)
+    print(f"Starting migration for {len_repos} repos")
     for repo in repos_to_sync:
         print(f"Migrating [b]{repo.full_repo_name}[/]")
         try:
             gt.migrate_repo(repo=repo, github_token=conf.github_token)
         except gitea.GiteaMigrationError as e:
-            print(e)
-    print(f"Migrated {len(repos_to_sync)} repos successfully")
+            print(f"[b red]Migration Error for {e.full_repo_name}[/]")
+            len_repos -= 1
+    print(f"Migrated {len_repos} out of {len(repos_to_sync)} repos successfully")
