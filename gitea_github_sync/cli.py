@@ -80,6 +80,6 @@ def sync() -> None:
         try:
             gt.migrate_repo(repo=repo, github_token=conf.github_token)
         except gitea.GiteaMigrationError as e:
-            print(f"[b red]Migration Error for {e.full_repo_name}[/]")
+            print(f"[red]Migration Error for [b]{e.full_repo_name}[/]")
             len_repos -= 1
     print(f"Migrated {len_repos} out of {len(repos_to_sync)} repos successfully")
