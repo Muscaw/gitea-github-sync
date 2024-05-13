@@ -60,7 +60,10 @@ def migrate_repo(full_repo_name: str) -> None:
         print(f"[b red]Repository {full_repo_name} does not exist on Github[/]")
         raise click.Abort()
 
-    gt.migrate_repo(repo=repo, github_token=conf.github_token)
+    try:
+        gt.migrate_repo(repo=repo, github_token=conf.github_token)
+    except gitea.GiteaMigrationError as e:
+        print(f"[red]Migration Error for [b]{e.full_repo_name}[/]")
 
 
 @cli.command()
@@ -82,4 +85,9 @@ def sync() -> None:
         except gitea.GiteaMigrationError as e:
             print(f"[red]Migration Error for [b]{e.full_repo_name}[/]")
             len_repos -= 1
-    print(f"Migrated {len_repos} out of {len(repos_to_sync)} repos successfully")
+    if len_repos == 0:
+        print("No repos were migrated")
+    else:
+        print(f"Migrated {len_repos} out of {len(repos_to_sync)} repos successfully")
+    if len_repos < len(repos_to_sync):
+        print(f"Failed {len(repos_to_sync) - len_repos} out of {len(repos_to_sync)} migrations")
