@@ -6,7 +6,7 @@ line-length = 100
 
 [tool.poetry]
 name = "gitea-github-sync"
-version = "0.1.2"
+version = "0.2.0"
 homepage = "https://github.com/Muscaw/gitea-github-sync"
 description = "Syncs your gitea instance with your Github account"
 authors = ["Kevin Grandjean <Muscaw@users.noreply.github.com>"]
