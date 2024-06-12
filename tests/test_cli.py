@@ -7,6 +7,7 @@ import pytest
 from click.testing import CliRunner
 
 from gitea_github_sync.cli import cli, print_repositories
+from gitea_github_sync.gitea import GiteaMigrationError
 from gitea_github_sync.repository import Repository, Visibility
 
 
@@ -127,6 +128,40 @@ def test_migrate_repo_no_match(
     mock_load_config.assert_called_once()
 
 
+@patch("gitea_github_sync.cli.config.load_config", autospec=True)
+@patch("gitea_github_sync.cli.github.list_all_repositories", autospec=True)
+@patch("gitea_github_sync.cli.github.get_github", autospec=True)
+@patch("gitea_github_sync.cli.gitea.get_gitea", autospec=True)
+def test_migrate_repo_gitea_migration_error(
+    mock_get_gitea: MagicMock,
+    mock_get_github: MagicMock,
+    mock_list_all_repositories: MagicMock,
+    mock_load_config: MagicMock,
+    repositories_fixture: List[Repository],
+) -> None:
+    expected_repo = Repository("Muscaw/gitea-github-sync", Visibility.PRIVATE)
+    expected_github_token = "some-github-token"
+
+    type(mock_load_config.return_value).github_token = PropertyMock(
+        return_value=expected_github_token
+    )
+    mock_list_all_repositories.return_value = repositories_fixture + [expected_repo]
+    mock_get_gitea.return_value.migrate_repo.side_effect = GiteaMigrationError(
+        full_repo_name=expected_repo.full_repo_name
+    )
+
+    runner = CliRunner()
+    command = ["migrate-repo", "Muscaw/gitea-github-sync"]
+    result = runner.invoke(cli, command)
+
+    assert result.exit_code == 0
+    assert "Migration Error for Muscaw/gitea-github-sync" in result.stdout
+    mock_list_all_repositories.assert_called_once_with(mock_get_github.return_value)
+    mock_get_gitea.return_value.migrate_repo.assert_called_once_with(
+        repo=expected_repo, github_token=expected_github_token
+    )
+
+
 NO_REPOS: List[Repository] = []
 MULTIPLE_REPOS = [
     Repository("some-team/a-repo", Visibility.PUBLIC),
@@ -143,7 +178,7 @@ MULTIPLE_REPOS = [
             textwrap.dedent(
                 """\
                 Starting migration for 0 repos
-                Migrated 0 repos successfully
+                No repos were migrated
             """
             ),
         ),
@@ -155,7 +190,7 @@ MULTIPLE_REPOS = [
                 Migrating some-team/a-repo
                 Migrating some-team/b-repo
                 Migrating some-team/c-repo
-                Migrated 3 repos successfully
+                Migrated 3 out of 3 repos successfully
                 """
             ),
         ),
@@ -181,6 +216,109 @@ def test_sync(
         return_value=expected_github_token
     )
     mock_list_missing_github_repos.return_value = repos_to_sync
+
+    runner = CliRunner()
+    command = ["sync"]
+    result = runner.invoke(cli, command)
+
+    assert result.exit_code == 0
+    assert result.stdout == expected_output
+    mock_load_config.assert_called_once()
+    mock_list_all_repositories.assert_called_once_with(mock_get_github.return_value)
+    mock_list_missing_github_repos.assert_called_once_with(
+        gh_repos=mock_list_all_repositories.return_value,
+        gitea_repos=mock_get_gitea.return_value.get_repos.return_value,
+    )
+    mock_get_gitea.return_value.migrate_repo.assert_has_calls(
+        [call(repo=repo, github_token=expected_github_token) for repo in repos_to_sync]
+    )
+
+
+REPOS_MIGRATION_ERR = [
+    Repository("some-team/a-repo", Visibility.PUBLIC),
+    Repository("some-team/migerr-repo", Visibility.PRIVATE),
+    Repository("some-team/c-repo", Visibility.UNKNOWN),
+]
+
+
+@pytest.mark.parametrize(
+    "repos_to_sync, expected_output",
+    [
+        (
+            NO_REPOS,
+            textwrap.dedent(
+                """\
+                Starting migration for 0 repos
+                No repos were migrated
+                """
+            ),
+        ),
+        (
+            MULTIPLE_REPOS,
+            textwrap.dedent(
+                """\
+                Starting migration for 3 repos
+                Migrating some-team/a-repo
+                Migrating some-team/b-repo
+                Migrating some-team/c-repo
+                Migrated 3 out of 3 repos successfully
+                """
+            ),
+        ),
+        (
+            [Repository("some-team/a-repo", Visibility.PUBLIC)],
+            textwrap.dedent(
+                """\
+                Starting migration for 1 repos
+                Migrating some-team/a-repo
+                Migrated 1 out of 1 repos successfully
+                """
+            ),
+        ),
+        (
+            REPOS_MIGRATION_ERR,
+            textwrap.dedent(
+                """\
+                Starting migration for 3 repos
+                Migrating some-team/a-repo
+                Migrating some-team/migerr-repo
+                Migration Error for some-team/migerr-repo
+                Migrating some-team/c-repo
+                Migrated 2 out of 3 repos successfully
+                Failed 1 out of 3 migrations
+                """
+            ),
+        ),
+    ],
+)
+@patch("gitea_github_sync.cli.migration.list_missing_github_repos", autospec=True)
+@patch("gitea_github_sync.cli.config.load_config", autospec=True)
+@patch("gitea_github_sync.cli.github.list_all_repositories", autospec=True)
+@patch("gitea_github_sync.cli.github.get_github", autospec=True)
+@patch("gitea_github_sync.cli.gitea.get_gitea", autospec=True)
+def test_sync_with_errors(
+    mock_get_gitea: MagicMock,
+    mock_get_github: MagicMock,
+    mock_list_all_repositories: MagicMock,
+    mock_load_config: MagicMock,
+    mock_list_missing_github_repos: MagicMock,
+    repos_to_sync: List[Repository],
+    expected_output: str,
+) -> None:
+    expected_github_token = "some-github-token"
+
+    type(mock_load_config.return_value).github_token = PropertyMock(
+        return_value=expected_github_token
+    )
+    mock_list_missing_github_repos.return_value = repos_to_sync
+    mock_get_gitea.return_value.get_repos.return_value = MULTIPLE_REPOS
+
+    # Mocking migrate_repo to raise an error for 'some-team/migerr-repo'
+    def migrate_repo_side_effect(repo: Repository, github_token: str) -> None:
+        if repo.full_repo_name == "some-team/migerr-repo":
+            raise GiteaMigrationError(full_repo_name=repo.full_repo_name)
+
+    mock_get_gitea.return_value.migrate_repo.side_effect = migrate_repo_side_effect
 
     runner = CliRunner()
     command = ["sync"]
