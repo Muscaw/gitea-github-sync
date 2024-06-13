@@ -640,13 +640,13 @@ files = [
 
 [[package]]
 name = "piny"
-version = "1.0.2"
+version = "1.1.0"
 description = "Load YAML configs with environment variables interpolation"
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "piny-1.0.2-py3-none-any.whl", hash = "sha256:3f59c24f1d6846f358c0c5d593336be646f2b5e2986c0bd57f2e5e96911e1e46"},
-    {file = "piny-1.0.2.tar.gz", hash = "sha256:f68478e449bdc4946bd7da6fa5d64c8541c933b4c3bdbeb4e35a5a7554d00cc2"},
+    {file = "piny-1.1.0-py3-none-any.whl", hash = "sha256:adc6873192dead13118e588901348cbb94c8163b128a34ed277694a875e05993"},
+    {file = "piny-1.1.0.tar.gz", hash = "sha256:18a005aeccb2af6f55790e539698865be4ab546661c27f410ec6871afe10118a"},
 ]
 
 [package.dependencies]
@@ -1257,4 +1257,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8.1"
-content-hash = "dfc27310eb3766f02a450b72b93225e8e64c166cb31e0ca9e53bfd22185cec78"
+content-hash = "f234a180409a5e859c6829e932f8fccc8f65948bc3aad60591d78f6032b11890"
